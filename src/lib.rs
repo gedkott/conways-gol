@@ -2,7 +2,7 @@ use std::cell::{Ref, RefCell};
 use std::fmt::Write;
 use std::rc::Rc;
 
-#[derive(Debug, std::cmp::PartialEq, Clone)]
+#[derive(Debug, std::cmp::PartialEq)]
 pub enum State {
     Dead,
     Alive,
@@ -73,7 +73,7 @@ impl Grid {
     pub fn step(&mut self) {
         let mut new_states = vec![];
 
-        // Second, iterate through self and update corresponding element in new_grid
+        // First, iterate through self and figure out the new state for each i, j position in the grid, storing the new state in a an aux memory space
         for i in 0..self.cells.len() {
             let row = self.cells.get(i);
             new_states.push(vec![]);
@@ -110,11 +110,13 @@ impl Grid {
             }
         }
 
-        // iterate through new_states updating each cell
+        // Second, iterate through new_states updating each corresponding position in self cells
         for i in 0..self.cells.len() {
             for j in 0..self.cells[i].len() {
-                // TODO(): do not like the need to clone the value of the state enum out of new_states
-                self.cells[i][j].borrow_mut().state = new_states[i][j].clone();
+                std::mem::swap(
+                    &mut new_states[i][j],
+                    &mut self.cells[i][j].borrow_mut().state,
+                );
             }
         }
     }

@@ -69,7 +69,8 @@ impl Grid {
         }
     }
 
-    // O(2 * n^2) - once for calculating the new states and once for actually updating the cells with their new states
+    // O(2 * n) - once for calculating the new states and once for actually updating the cells with their new states
+    // where n represents the number of cells in our grid
     pub fn step(&mut self) {
         let mut new_states = vec![];
 

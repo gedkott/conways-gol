@@ -1,11 +1,21 @@
 use std::cell::{Ref, RefCell};
-use std::fmt::Write;
+use std::fmt::{Display, Formatter, Result, Write};
 use std::rc::Rc;
 
 #[derive(Debug, std::cmp::PartialEq)]
 pub enum State {
     Dead,
     Alive,
+}
+
+impl Display for State {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        let char = match self {
+            Self::Alive => '@',
+            Self::Dead => '.',
+        };
+        f.write_char(char)
+    }
 }
 
 pub type GOLCellRef = Rc<RefCell<GOLCell>>;
@@ -17,7 +27,7 @@ pub struct GOLCell {
 }
 
 impl std::fmt::Display for GOLCell {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         self.state.fmt(f)
     }
 }
@@ -37,16 +47,6 @@ impl GOLCell {
 
 pub struct Grid {
     pub cells: Vec<Vec<GOLCellRef>>,
-}
-
-impl std::fmt::Display for State {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let char = match self {
-            Self::Alive => '@',
-            Self::Dead => '.',
-        };
-        f.write_char(char)
-    }
 }
 
 impl Grid {
@@ -112,12 +112,9 @@ impl Grid {
         }
 
         // Second, iterate through new_states updating each corresponding position in self cells
-        for i in 0..self.cells.len() {
-            for j in 0..self.cells[i].len() {
-                std::mem::swap(
-                    &mut new_states[i][j],
-                    &mut self.cells[i][j].borrow_mut().state,
-                );
+        for (i, row) in new_states.iter_mut().enumerate().take(self.cells.len()) {
+            for (j, state) in row.iter_mut().enumerate().take(self.cells[i].len()) {
+                std::mem::swap(state, &mut self.cells[i][j].borrow_mut().state);
             }
         }
     }

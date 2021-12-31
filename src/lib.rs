@@ -4,8 +4,8 @@ use std::rc::Rc;
 
 #[derive(Debug, std::cmp::PartialEq)]
 pub enum State {
-    Dead,
     Alive,
+    Dead,
 }
 
 impl Display for State {
@@ -61,7 +61,10 @@ impl Grid {
     }
 
     pub fn get_neighbors(&self, row: usize, col: usize) -> Ref<'_, Vec<GOLCellRef>> {
-        let cell = self.cells.get(row).and_then(|row| row.get(col));
+        let cell: Option<&GOLCellRef> = self
+            .cells
+            .get(row)
+            .and_then(|row: &Vec<GOLCellRef>| row.get(col));
         match cell {
             // See: https://stackoverflow.com/questions/29401626/how-do-i-return-a-reference-to-something-inside-a-refcell-without-breaking-encap
             Some(c) => Ref::map(c.borrow(), |c| &c.neighbors),
@@ -76,12 +79,12 @@ impl Grid {
 
         // First, iterate through self and figure out the new state for each i, j position in the grid, storing the new state in a an aux memory space
         for i in 0..self.cells.len() {
-            let row = self.cells.get(i);
+            let row: Option<&Vec<GOLCellRef>> = self.cells.get(i);
             new_states.push(vec![]);
-            for j in 0..row.map(|r| r.len()).unwrap_or(0) {
+            for j in 0..row.map(|r: &Vec<GOLCellRef>| r.len()).unwrap_or(0) {
                 let alive_neighbors = {
-                    let neighbors = self.get_neighbors(i, j);
-                    neighbors.iter().fold(0, |acc, cell| {
+                    let neighbors: Ref<Vec<GOLCellRef>> = self.get_neighbors(i, j);
+                    neighbors.iter().fold(0, |acc, cell: &GOLCellRef| {
                         let add = if cell.borrow().state == State::Alive {
                             1
                         } else {
@@ -90,7 +93,10 @@ impl Grid {
                         acc + add
                     })
                 };
-                let cell = self.cells.get_mut(i).and_then(|row| row.get_mut(j));
+                let cell: Option<&mut GOLCellRef> = self
+                    .cells
+                    .get_mut(i)
+                    .and_then(|row: &mut Vec<GOLCellRef>| row.get_mut(j));
                 // Should never see a non-Some type of cell so not perfect, but reasonable way to do this
                 if let Some(c) = cell {
                     let borrowed_cell = c.borrow_mut();
@@ -112,8 +118,8 @@ impl Grid {
         }
 
         // Second, iterate through new_states updating each corresponding position in self cells
-        for (i, row) in new_states.iter_mut().enumerate().take(self.cells.len()) {
-            for (j, state) in row.iter_mut().enumerate().take(self.cells[i].len()) {
+        for (i, row) in new_states.iter_mut().enumerate() {
+            for (j, state) in row.iter_mut().enumerate() {
                 std::mem::swap(state, &mut self.cells[i][j].borrow_mut().state);
             }
         }

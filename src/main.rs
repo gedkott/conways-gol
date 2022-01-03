@@ -3,9 +3,10 @@ use std::{cell::RefCell, rc::Rc};
 use conways_gol::{GOLCell, Grid, State};
 
 fn populate_neighbors_from_grid_for_cell_at(grid: &Grid, row: usize, col: usize) {
-    // TODO(gedkott): next line is able to panic even though it should not
-    // Lazy use of wrapping sub instead of doing actual math
+    // TODO(gedkott): next line is able to panic because of the index operator even though it should not because we know the indexes are filled at this point
     let mut mut_brwed_cell = grid.cells[row][col].borrow_mut();
+
+    // Lazy use of wrapping sub instead of doing actual math
     for (i, j) in [
         (row.wrapping_sub(1), col.wrapping_sub(1)), // top left
         (row, col.wrapping_sub(1)),                 // top
@@ -63,6 +64,7 @@ fn main() {
     let alive_cols = [1, 2, 3];
 
     for col in alive_cols {
+        // TODO(gedkott): next line is able to panic because of the index operator even though it should not because we know the indexes are filled at this point
         grid.cells[alive_row][col].borrow_mut().state = State::Alive;
     }
 

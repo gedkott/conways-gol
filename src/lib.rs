@@ -81,6 +81,7 @@ impl Grid {
         for i in 0..self.cells.len() {
             let row: Option<&Vec<GOLCellRef>> = self.cells.get(i);
             new_states.push(vec![]);
+            // unwrap_or is not as bad of an idea as unwrap
             for j in 0..row.map(|r: &Vec<GOLCellRef>| r.len()).unwrap_or(0) {
                 let alive_neighbors = {
                     let neighbors: Ref<Vec<GOLCellRef>> = self.get_neighbors(i, j);
@@ -120,6 +121,7 @@ impl Grid {
         // Second, iterate through new_states updating each corresponding position in self cells
         for (i, row) in new_states.iter_mut().enumerate() {
             for (j, state) in row.iter_mut().enumerate() {
+                // TODO(gedkott): next line is able to panic because of the index operator even though it should not because we know the indexes are filled at this point
                 std::mem::swap(state, &mut self.cells[i][j].borrow_mut().state);
             }
         }

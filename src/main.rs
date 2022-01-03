@@ -4,6 +4,7 @@ use conways_gol::{GOLCell, Grid, State};
 
 fn populate_neighbors_from_grid_for_cell_at(grid: &Grid, row: usize, col: usize) {
     // TODO(gedkott): next line is able to panic even though it should not
+    // Lazy use of wrapping sub instead of doing actual math
     let mut mut_brwed_cell = grid.cells[row][col].borrow_mut();
     for (i, j) in [
         (row.wrapping_sub(1), col.wrapping_sub(1)), // top left
@@ -74,6 +75,7 @@ fn main() {
                 grid.cells
                     .get(i)
                     .and_then(|row| row.get(j))
+                    // generally I don't recomment ever calling unwrap unless it really makes sense - note that in the actual module in lib.rs I never call unwrap - always handle the case of unexpected values somehow
                     .unwrap()
                     .borrow()
             );

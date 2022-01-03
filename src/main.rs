@@ -17,7 +17,7 @@ fn populate_neighbors_from_grid_for_cell_at(grid: &Grid, row: usize, col: usize)
     ] {
         let neighbor = grid.cells.get(i).and_then(|r| r.get(j));
         if let Some(c) = neighbor {
-            mut_brwed_cell.add_neighbor(c.clone());
+            mut_brwed_cell.add_neighbor(Rc::clone(c));
             println!(
                 "cell at {:?} is getting neighbor at {:?}",
                 (row, col),

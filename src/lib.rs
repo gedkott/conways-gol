@@ -99,7 +99,7 @@ impl Grid {
                     .and_then(|row: &mut Vec<GOLCellRef>| row.get_mut(j));
                 // Should never see a non-Some type of cell so not perfect, but reasonable way to do this
                 if let Some(c) = cell {
-                    let borrowed_cell = c.borrow_mut();
+                    let borrowed_cell = c.borrow();
                     let new_state = match (&borrowed_cell.state, alive_neighbors) {
                         (State::Alive, 2) => State::Alive,
                         (State::Alive, 3) => State::Alive,

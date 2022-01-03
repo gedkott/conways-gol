@@ -68,6 +68,7 @@ impl Grid {
         match cell {
             // See: https://stackoverflow.com/questions/29401626/how-do-i-return-a-reference-to-something-inside-a-refcell-without-breaking-encap
             Some(c) => Ref::map(c.borrow(), |c| &c.neighbors),
+            // technically this is reachable, but I am making the assumption that we know that the row and col provided are guaranteed to be in the grid
             None => unreachable!(),
         }
     }
